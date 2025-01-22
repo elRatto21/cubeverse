@@ -10,23 +10,21 @@ export const authController = {
     res: Response
   ) => {
     try {
-      const { username, email, password } = req.body;
+      const { username, password } = req.body;
 
       const existingUser = await User.findOne({ 
-        $or: [{ email }, { username }] 
+        $or: [{ username }] 
       });
       
       if (existingUser) {
         return res.status(400).json({ 
-          message: existingUser.email === email ? 
-            'Email already registered' : 
+          message: existingUser.username === username &&
             'Username already taken'
         });
       }
 
       const user = await User.create({
         username,
-        email,
         password
       });
 
@@ -46,7 +44,6 @@ export const authController = {
       const userResponse: UserResponse = {
         id: user._id as string,
         username: user.username,
-        email: user.email
       };
 
       return res.status(201).json({ user: userResponse });
@@ -61,9 +58,9 @@ export const authController = {
     res: Response
   ) => {
     try {
-      const { email, password } = req.body;
+      const { username, password } = req.body;
 
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ username });
       if (!user) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
@@ -89,7 +86,6 @@ export const authController = {
       const userResponse: UserResponse = {
         id: user._id as string,
         username: user.username,
-        email: user.email
       };
 
       return res.json({ user: userResponse });
