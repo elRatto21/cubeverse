@@ -28,20 +28,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex pt-[15dvh] justify-center">
+    <div className="min-h-screen flex pt-[15dvh] justify-center select-none">
       <div className="max-w-md w-full space-y-8 p-8">
         <GradientText
           colors={[
-            //"#ea580c",
-            //"#fb923c",
-            //"#fdba74",
-            //"#fb923c",
-            //"#ea580c",
-            //"#fb923c",
-            //"#fdba74",
-            //"#fb923c",
-            //"#ea580c",
-            //'#c084fc',
             "#a855f7",
             "#9333ea",
             "#7e22ce",
@@ -89,7 +79,7 @@ export default function LoginPage() {
           <div className="flex justify-center">
             <Link
               href="/register"
-              className="text-orange-600 hover:text-orange-700"
+              className="text-purple-600 hover:text-purple-700 hover:scale-110 ease-in-out transform transition duration-150"
             >
               Create an account
             </Link>
