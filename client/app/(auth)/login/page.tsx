@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/store/useAuth";
 import GradientText from "@/components/blocks/TextAnimations/GradientText/GradientText";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,17 +28,37 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex pt-[20dvh] justify-center">
+    <div className="min-h-screen flex pt-[15dvh] justify-center">
       <div className="max-w-md w-full space-y-8 p-8">
         <GradientText
-          colors={["#ea580c", "#fb923c", "#fdba74", "#fb923c", "#ea580c", "#fb923c", "#fdba74", "#fb923c", "#ea580c"]}
+          colors={[
+            //"#ea580c",
+            //"#fb923c",
+            //"#fdba74",
+            //"#fb923c",
+            //"#ea580c",
+            //"#fb923c",
+            //"#fdba74",
+            //"#fb923c",
+            //"#ea580c",
+            //'#c084fc',
+            "#a855f7",
+            "#9333ea",
+            "#7e22ce",
+            "#a855f7",
+            "#9333ea",
+            "#7e22ce",
+            "#a855f7",
+            "#9333ea",
+            "#7e22ce",
+          ]}
           animationSpeed={5}
           showBorder={false}
           className="text-6xl font-superbold text-center text-orange"
         >
           cubeverse
         </GradientText>
-        <h2 className="text-center text-3xl font-bold mt-6">Login</h2>
+        <h2 className="text-center text-3xl font-bold pt-3">Login</h2>
         <form onSubmit={handleSubmit} className="mt-2 space-y-6">
           <Input
             type="text"
@@ -52,15 +74,27 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          {error && <div className="text-red-500 text-sm">{error}</div>}
-          <Button
-            type="submit"
-            className="w-full bg-orange-600"
-            disabled={loading}
-          >
+          {error && <div className="text-primary text-sm">{error}</div>}
+          <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </Button>
         </form>
+
+        <div className="flex flex-col justify-center pt-6 gap-5">
+          <div className="flex justify-between items-center">
+            <Separator className="w-[40%] ml-3" />
+            <span className="">or</span>
+            <Separator className="w-[40%] mr-3" />
+          </div>
+          <div className="flex justify-center">
+            <Link
+              href="/register"
+              className="text-orange-600 hover:text-orange-700"
+            >
+              Create an account
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
