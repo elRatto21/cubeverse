@@ -1,5 +1,6 @@
 "use client";
 
+import ScrambleBox from "@/components/timer/scramble-box";
 import { useEffect, useState, useCallback, useRef } from "react";
 
 interface TimerState {
@@ -10,6 +11,10 @@ interface TimerState {
   pressDuration: number;
 }
 
+interface UserPreferences {
+  pressDuration: number;
+}
+
 const TimerPage = () => {
   const [timerState, setTimerState] = useState<TimerState>({
     time: 0,
@@ -17,6 +22,11 @@ const TimerPage = () => {
     isPressed: false,
     pressStartTime: 0,
     pressDuration: 0,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [userPrefrences, setUserPreferences] = useState<UserPreferences>({
+    pressDuration: 300,
   });
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -59,7 +69,7 @@ const TimerPage = () => {
       if (!prev.isRunning && prev.isPressed) {
         const currentPressDuration = performance.now() - prev.pressStartTime;
 
-        if (currentPressDuration >= 500) {
+        if (currentPressDuration >= userPrefrences.pressDuration) {
           return {
             ...prev,
             isPressed: false,
@@ -142,7 +152,7 @@ const TimerPage = () => {
     if (timerState.isPressed) {
       const checkReady = () => {
         const holdDuration = performance.now() - timerState.pressStartTime;
-        setIsReady(holdDuration >= 500);
+        setIsReady(holdDuration >= userPrefrences.pressDuration);
         animationFrame = requestAnimationFrame(checkReady);
       };
 
@@ -156,18 +166,16 @@ const TimerPage = () => {
         cancelAnimationFrame(animationFrame);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timerState.isPressed, timerState.pressStartTime]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <div
-        className={`text-xl mb-4 ${
-          isReady ? "text-green-500" : "text-red-500"
-        }`}
+        className={`text-6xl font-semibold ${isReady && "text-green-500"}`}
       >
-        {isReady ? "Ready!" : "Hold space to start"}
+        {formatTime(timerState.time)}
       </div>
-      <div className="text-6xl font-mono">{formatTime(timerState.time)}</div>
     </div>
   );
 };
