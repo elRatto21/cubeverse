@@ -31,6 +31,7 @@
     "google-auth-library": "^9.15.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
+    "scrambow": "^1.8.1",
     "socket.io": "^4.8.1"
   }
 }
