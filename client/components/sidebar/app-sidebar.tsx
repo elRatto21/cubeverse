@@ -5,6 +5,7 @@ import {
   BookOpenIcon,
   BoxIcon,
   ChartLineIcon,
+  HomeIcon,
   MessageCircleIcon,
   Repeat2Icon,
   SwordsIcon,
@@ -27,6 +28,13 @@ import {
 import NavNotifications from "./nav-notifications";
 
 const data = {
+  dashBoardItem: [
+    {
+      title: "Dashboard",
+      url: "dashboard",
+      icon: HomeIcon
+    }
+  ],
   playItems: [
     {
       title: "Timer",
@@ -96,6 +104,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
+        <NavMain title="Dashboard" items={data.dashBoardItem} />
         <NavMain title="Play" items={data.playItems} />
         <NavMain title="Social" items={data.socialItems} />
       </SidebarContent>
