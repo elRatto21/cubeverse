@@ -1,6 +1,7 @@
 "use client";
 
-import ScrambleBox from "@/components/timer/scramble-box";
+import { Button } from "@/components/ui/button";
+import { RefreshCcwIcon } from "lucide-react";
 import { useEffect, useState, useCallback, useRef } from "react";
 
 interface TimerState {
@@ -89,6 +90,7 @@ const TimerPage = () => {
       }
       return prev;
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle timer updates
@@ -142,6 +144,7 @@ const TimerPage = () => {
 
   const solveFinished = (finalTime: number) => {
     console.log("Solve finished:", Math.floor(finalTime));
+    nextScramble();
   };
 
   const [isReady, setIsReady] = useState(false);
@@ -169,11 +172,45 @@ const TimerPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timerState.isPressed, timerState.pressStartTime]);
 
+  const [scrambles, setScrambles] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cube/scramble?count=3`)
+      .then((res) => res.json())
+      .then((data) => {
+        setScrambles(data.scrambles);
+      });
+  }, []);
+
+  const nextScramble = async () => {
+    if (scrambles.length <= 2) {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/cube/scramble?count=10`
+        );
+        const data = await res.json();
+
+        setScrambles((prev) => {
+          const remaining = prev.slice(1);
+          return [...remaining, ...data.scrambles];
+        });
+      } catch (error) {
+        console.error("Failed to fetch new scrambles:", error);
+      }
+    } else {
+      setScrambles((prev) => prev.slice(1));
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <div
-        className={`text-6xl font-semibold ${isReady && "text-green-500"}`}
-      >
+    <div className="flex flex-col items-center justify-center min-h-screen w-full gap-10">
+      <div className="flex flex-col justify-center items-center">
+        <div className="text-gray-700 text-center text-xl">{scrambles[0]}</div>
+        <Button size="icon" variant="ghost" onClick={() => nextScramble()}>
+          <RefreshCcwIcon size={16} />
+        </Button>
+      </div>
+      <div className={`text-7xl font-semibold ${isReady && "text-green-500"}`}>
         {formatTime(timerState.time)}
       </div>
     </div>
