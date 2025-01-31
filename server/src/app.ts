@@ -16,6 +16,8 @@ app.use(cors({
   credentials: true  // Important for cookies
 }));
 
+app.set('trust proxy', 1);
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/cube', scrambleRoutes)
