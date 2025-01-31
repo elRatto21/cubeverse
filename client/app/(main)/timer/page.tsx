@@ -33,6 +33,14 @@ const TimerPage = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(0);
 
+  const timerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (timerRef.current) {
+      timerRef.current.focus();
+    }
+  }, []);
+
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.code !== "Space") return;
 
@@ -210,7 +218,10 @@ const TimerPage = () => {
           <RefreshCcwIcon size={16} />
         </Button>
       </div>
-      <div className={`text-7xl font-semibold ${isReady && "text-green-500"}`}>
+      <div
+        ref={timerRef}
+        className={`text-7xl font-semibold ${isReady && "text-green-500"}`}
+      >
         {formatTime(timerState.time)}
       </div>
     </div>
