@@ -28,6 +28,8 @@ interface UserPreferences {
 }
 
 const TimerPage = () => {
+  const [event] = useState("3x3");
+
   const [timerState, setTimerState] = useState<TimerState>({
     time: 0,
     isRunning: false,
