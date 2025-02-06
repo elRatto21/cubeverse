@@ -1,15 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarMenu,
-  SidebarRail,
 } from "@/components/ui/sidebar";
 import { Toggle } from "@/components/ui/toggle";
 import { RefreshCcwIcon, Trash2Icon } from "lucide-react";
@@ -38,9 +35,7 @@ const TimerPage = () => {
     pressDuration: 0,
   });
 
-  const [solves, setSolves] = useState<
-    { time: number; dnf: boolean; plusTwo: boolean }[]
-  >([]);
+  const [solves, setSolves] = useState([]);
 
   const [userPrefrences] = useState<UserPreferences>({
     pressDuration: 300,
@@ -179,9 +174,10 @@ const TimerPage = () => {
       .padStart(2, "0")}.${milliseconds.toString().padStart(2, "0")}`;
   };
 
+  const scrambleRef = useRef("");
+
   const solveFinished = (finalTime: number) => {
     console.log("Solve finished:", Math.floor(finalTime));
-    nextScramble();
 
     const solve = {
       time: Math.floor(finalTime),
@@ -189,7 +185,30 @@ const TimerPage = () => {
       plusTwo: false,
     };
 
-    solves.unshift(solve);
+    console.log("scrambles:", scrambles);
+    console.log("current scramble:", scrambles[0]);
+
+    const postSolve = {
+      ...solve,
+      scramble: scrambleRef.current,
+      event: event,
+    };
+
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/solve`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(postSolve),
+    });
+
+    console.log("solves:", solves);
+
+    //@ts-expect-error works
+    setSolves((prevSolves) => [solve, ...prevSolves]);
+
+    nextScramble();
 
     genQuickStats();
   };
@@ -230,24 +249,31 @@ const TimerPage = () => {
   }, []);
 
   const nextScramble = async () => {
-    if (scrambles.length <= 2) {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/cube/scramble?count=10`
-        );
-        const data = await res.json();
-
-        setScrambles((prev) => {
-          const remaining = prev.slice(1);
-          return [...remaining, ...data.scrambles];
-        });
-      } catch (error) {
-        console.error("Failed to fetch new scrambles:", error);
-      }
-    } else {
-      setScrambles((prev) => prev.slice(1));
-    }
+    setScrambles((prev) => prev.slice(1));
   };
+
+  useEffect(() => {
+    async function newScrambles() {
+      if (scrambles.length < 2) {
+        try {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/cube/scramble?count=10`
+          );
+          const data = await res.json();
+
+          setScrambles((prev) => {
+            return [...prev, ...data.scrambles];
+          });
+        } catch (error) {
+          console.error("Failed to fetch new scrambles:", error);
+        }
+      }
+    }
+
+    newScrambles();
+
+    scrambleRef.current = scrambles[0];
+  }, [scrambles]);
 
   interface QuickStats {
     currentAo5: number | null;
@@ -266,6 +292,7 @@ const TimerPage = () => {
 
   useEffect(() => {
     genQuickStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solves]);
 
   const calculateAverage = (times: number[]): number => {
@@ -273,6 +300,7 @@ const TimerPage = () => {
     return times.reduce((a, b) => a + b, 0) / times.length;
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const calculateRollingAverage = (solves: any[], n: number): number[] => {
     if (solves.length < n) return [];
 
@@ -298,8 +326,10 @@ const TimerPage = () => {
   const genQuickStats = () => {
     let data = solves;
 
+    //@ts-expect-error works
     data = data.filter((solve) => solve.dnf == false);
 
+    //@ts-expect-error works
     const times = data.map((solve) => solve.time);
 
     const bestTime = Math.min(...times);
@@ -326,11 +356,14 @@ const TimerPage = () => {
 
   useEffect(() => {
     fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/solve?limit=1000&type=history`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/solve?limit=100&event=3x3&type=history`,
+      {
+        credentials: "include",
+      }
     )
       .then((res) => res.json())
       .then((data) => {
-        setSolves(data.solves);
+        setSolves(data.data);
       });
   }, []);
 
@@ -347,7 +380,7 @@ const TimerPage = () => {
         </div>
         <div
           ref={timerRef}
-          className={`text-7xl font-semibold w-max mx-auto text-left ${
+          className={`text-7xl font-semibold w-[130px] mx-auto text-left ${
             isReady && "text-green-500"
           }`}
         >
@@ -366,7 +399,12 @@ const TimerPage = () => {
                   key={i}
                   className="flex items-center justify-between mx-auto w-[90%]"
                 >
-                  <div className="text-xl">{formatTime(solve.time)}</div>
+                  <div className="text-xl">
+                    {
+                      //@ts-expect-error works
+                      formatTime(solve.time)
+                    }
+                  </div>
                   <div className="flex items-center justify-center">
                     <Toggle>+2</Toggle>
                     <Toggle>DNF</Toggle>
@@ -379,17 +417,19 @@ const TimerPage = () => {
             </SidebarGroupContent>
           </SidebarGroup>
           <SidebarGroup>
-            <SidebarGroupLabel className="text-lg mt-2">Stats</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-lg mt-2">
+              Stats
+            </SidebarGroupLabel>
             <SidebarGroupContent className="flex flex-col gap-3 text-lg ml-2 mt-1">
               <div>
                 <span className="font-bold">Single</span>
-                <div className="flex justify-between w-[50%]">
+                <div className="flex justify-between w-[60%]">
                   Best:
                   <span className="font-semibold">
                     {formatTime(quickStats?.bestTime)}
                   </span>
                 </div>
-                <div className="flex justify-between w-[50%]">
+                <div className="flex justify-between w-[60%]">
                   Worst:
                   <span className="font-semibold">
                     {formatTime(quickStats?.worstTime)}
@@ -399,13 +439,13 @@ const TimerPage = () => {
 
               <div>
                 <span className="font-bold">Ao5</span>
-                <div className="flex justify-between w-[50%]">
+                <div className="flex justify-between w-[60%]">
                   Current:
                   <span className="font-semibold">
                     {formatTime(quickStats?.currentAo5)}
                   </span>
                 </div>
-                <div className="flex justify-between w-[50%]">
+                <div className="flex justify-between w-[60%]">
                   Best:
                   <span className="font-semibold">
                     {formatTime(quickStats?.bestAo5)}
@@ -415,13 +455,13 @@ const TimerPage = () => {
 
               <div>
                 <span className="font-bold">Ao12</span>
-                <div className="flex justify-between w-[50%]">
+                <div className="flex justify-between w-[60%]">
                   Current:
                   <span className="font-semibold">
                     {formatTime(quickStats?.currentAo12)}
                   </span>
                 </div>
-                <div className="flex justify-between w-[50%]">
+                <div className="flex justify-between w-[60%]">
                   Best:
                   <span className="font-semibold">
                     {formatTime(quickStats?.bestAo12)}
@@ -431,13 +471,13 @@ const TimerPage = () => {
 
               <div>
                 <span className="font-bold">Ao100</span>
-                <div className="flex justify-between w-[50%]">
+                <div className="flex justify-between w-[60%]">
                   Current:
                   <span className="font-semibold">
                     {formatTime(quickStats?.currentAo100)}
                   </span>
                 </div>
-                <div className="flex justify-between w-[50%]">
+                <div className="flex justify-between w-[60%]">
                   Best:
                   <span className="font-semibold">
                     {formatTime(quickStats?.bestAo100)}
