@@ -8,5 +8,6 @@ const solveRouter = Router();
 
 solveRouter.post('', authMiddleware, solveController.createSolve)
 solveRouter.get('', authMiddleware, solveController.getSolves)
+solveRouter.get('/alltime', authMiddleware, solveController.getAlltime)
 
 export default solveRouter;
