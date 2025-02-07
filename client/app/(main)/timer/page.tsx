@@ -391,16 +391,16 @@ const TimerPage = () => {
         </div>
       </div>
       <Sidebar side="right" className="shadow-sm px-3">
-        <SidebarContent>
+        <SidebarContent className="flex flex-col justify-between py-8">
           <SidebarGroup>
-            <SidebarGroupLabel className="text-lg mt-5">
+            <SidebarGroupLabel className="text-lg pl-0">
               Previous solves
             </SidebarGroupLabel>
-            <SidebarGroupContent className="h-[35dvh] overflow-y-scroll cust-scrollbar">
+            <SidebarGroupContent className="h-[35dvh] overflow-y-scroll overflow-x-hidden cust-scrollbar">
               {solves.map((solve, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between mx-auto w-[90%]"
+                  className="flex items-center justify-between"
                 >
                   <div className="text-xl">
                     {
@@ -420,10 +420,10 @@ const TimerPage = () => {
             </SidebarGroupContent>
           </SidebarGroup>
           <SidebarGroup>
-            <SidebarGroupLabel className="text-lg mt-2">
+            <SidebarGroupLabel className="text-lg mt-2 pl-0">
               Stats
             </SidebarGroupLabel>
-            <SidebarGroupContent className="flex flex-col gap-3 text-lg ml-2 mt-1">
+            <SidebarGroupContent className="flex flex-col gap-3 text-lg mt-1">
               <div>
                 <span className="font-bold">Single</span>
                 <div className="flex justify-between w-[60%]">
