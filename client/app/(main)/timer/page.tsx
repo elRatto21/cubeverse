@@ -383,7 +383,7 @@ const TimerPage = () => {
         </div>
         <div
           ref={timerRef}
-          className={`text-7xl font-semibold w-[130px] mx-auto text-left ${
+          className={`text-7xl font-bold tabular-nums text-center tracking-wider ${timerState.isPressed && !isReady && "text-red-500"} ${
             isReady && "text-green-500"
           }`}
         >
