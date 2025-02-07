@@ -1,17 +1,152 @@
-'use client';
-import { useAuth } from "@/store/useAuth"
+"use client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatDate, formatSolveTime } from "@/lib/utils";
+import { getDashboardStats } from "@/services/statsService";
+import { useAuth } from "@/store/useAuth";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 const DashboardPage = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [dashboardStats, setDashboardStats] = useState<any>();
 
-    const { user, loading, error} = useAuth();
+  const { user } = useAuth();
 
-    return (
-        <div>
-            {loading && <div>Loading...</div>}
-            {error && <div>Error: {error}</div>}
-            {user && <div>Welcome, {user.username}! {user.id} </div>}
+  const router = useRouter();
+
+  useEffect(() => {
+    async function fetchStats() {
+      const data = await getDashboardStats();
+      setDashboardStats(data);
+
+      console.log("data:", data);
+    }
+
+    fetchStats();
+  }, []);
+
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    if (event.code !== "Space") return;
+
+    router.push("/timer");
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
+  return (
+    <div className="flex flex-col w-[75dvw] py-16 mx-auto">
+      <div className="text-4xl font-bold">Hi {user && user.username} 👋</div>
+      <div className="text-3xl mt-2 text-gray-600">
+        Press <span className="font-semibold">Space</span> to start cubing
+      </div>
+      <div className="grid grid-cols-1 gap-10 mt-16">
+        <div className="flex gap-6">
+          <Card className="text-center w-fit">
+            <CardHeader>
+              <CardTitle className="text-3xl">Current PR</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {dashboardStats ? (
+                <>
+                  <div className="text-3xl font-semibold">
+                    {formatSolveTime(dashboardStats.pb.time)}
+                  </div>
+                  <div className="text-xl mt-2">
+                    {formatDate(dashboardStats.pb.createdAt)}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-3xl">&nbsp;</div>
+                  <div className="text-xl mt-2">&nbsp;</div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+          <Card className="text-center w-fit">
+            <CardHeader>
+              <CardTitle className="text-3xl">Last solve</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {dashboardStats ? (
+                <>
+                  <div className="text-3xl font-semibold">
+                    {formatSolveTime(dashboardStats.worst.time)}
+                  </div>
+                  <div className="text-xl mt-2">
+                    {formatDate(dashboardStats.worst.createdAt)}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-3xl">&nbsp;</div>
+                  <div className="text-xl mt-2">&nbsp;</div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+          <Card className="text-center w-fit">
+            <CardHeader>
+              <CardTitle className="text-3xl">Average</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {dashboardStats ? (
+                <>
+                  <div className="text-3xl font-semibold">
+                    {formatSolveTime(Math.floor(dashboardStats.avg[0].avgTime))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-3xl">&nbsp;</div>
+                </>
+              )}
+            </CardContent>
+          </Card>
         </div>
-    )
-} 
+        <div className="flex gap-6">
+          <Card className="text-center w-fit min-w-[200px]">
+            <CardHeader>
+              <CardTitle className="text-3xl">ELO</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {dashboardStats ? (
+                <>
+                  <div className="text-3xl font-semibold">0</div>
+                </>
+              ) : (
+                <>
+                  <div className="text-3xl">&nbsp;</div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+          <Card className="text-center w-fit">
+            <CardHeader>
+              <CardTitle className="text-3xl">Total battles</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {dashboardStats ? (
+                <>
+                  <div className="text-3xl font-semibold">0</div>
+                </>
+              ) : (
+                <>
+                  <div className="text-3xl">&nbsp;</div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default DashboardPage;
