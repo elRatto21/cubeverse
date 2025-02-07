@@ -283,6 +283,7 @@ const TimerPage = () => {
     currentAo100: number | null;
     bestAo100: number | null;
     bestTime: number;
+    avgTime: number;
     worstTime: number;
   }
 
@@ -334,6 +335,7 @@ const TimerPage = () => {
 
     const bestTime = Math.min(...times);
     const worstTime = Math.max(...times);
+    const avgTime = (times: number[]) => times.reduce((a, b) => a + b) / times.length;
 
     const ao5s = calculateRollingAverage(data, 5);
     const ao12s = calculateRollingAverage(data, 12);
@@ -350,6 +352,7 @@ const TimerPage = () => {
       bestAo100: ao100s.length > 0 ? Math.min(...ao100s) : null,
 
       bestTime,
+      avgTime: avgTime(times),
       worstTime,
     });
   };
@@ -427,6 +430,12 @@ const TimerPage = () => {
                   Best:
                   <span className="font-semibold">
                     {formatTime(quickStats?.bestTime)}
+                  </span>
+                </div>
+                <div className="flex justify-between w-[60%]">
+                  Avg:
+                  <span className="font-semibold">
+                    {formatTime(quickStats?.avgTime)}
                   </span>
                 </div>
                 <div className="flex justify-between w-[60%]">
