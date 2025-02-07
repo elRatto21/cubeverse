@@ -1,5 +1,6 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate, formatSolveTime } from "@/lib/utils";
 import { getDashboardStats } from "@/services/statsService";
 import { useAuth } from "@/store/useAuth";
@@ -41,7 +42,7 @@ const DashboardPage = () => {
 
   return (
     <div className="flex flex-col w-[75dvw] py-16 mx-auto">
-      <div className="text-4xl font-bold">Hi {user && user.username} 👋</div>
+      <div className="text-4xl font-bold flex">Hi {user ? user.username : <Skeleton className="h-full w-[100px] ml-2" />} 👋</div>
       <div className="text-3xl mt-2 text-gray-600">
         Press <span className="font-semibold">Space</span> to start cubing
       </div>
