@@ -82,6 +82,7 @@ const TimerPage = () => {
 
       return prev;
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
@@ -335,7 +336,7 @@ const TimerPage = () => {
 
     const bestTime = Math.min(...times);
     const worstTime = Math.max(...times);
-    const avgTime = (times: number[]) => times.reduce((a, b) => a + b) / times.length;
+    const avgTime = (times: number[]) => times.length > 0 ? times.reduce((a, b) => a + b) / times.length : 0;
 
     const ao5s = calculateRollingAverage(data, 5);
     const ao12s = calculateRollingAverage(data, 12);
