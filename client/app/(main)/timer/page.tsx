@@ -390,13 +390,13 @@ const TimerPage = () => {
           {formatTime(timerState.time)}
         </div>
       </div>
-      <Sidebar side="right" className="shadow-sm">
+      <Sidebar side="right" className="shadow-sm px-3">
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel className="text-lg mt-5">
               Previous solves
             </SidebarGroupLabel>
-            <SidebarGroupContent className="h-[35dvh] overflow-y-scroll">
+            <SidebarGroupContent className="h-[35dvh] overflow-y-scroll cust-scrollbar">
               {solves.map((solve, i) => (
                 <div
                   key={i}
