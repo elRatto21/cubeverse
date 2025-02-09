@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   const isPublicPath = request.nextUrl.pathname === "/login" || 
                        request.nextUrl.pathname === "/register";
 
-  if (!token && isPublicPath) {
+  if (!token && !isPublicPath) {
     const url = new URL("/login", request.url);
     return NextResponse.redirect(url);
   }
